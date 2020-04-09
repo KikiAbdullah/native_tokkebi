@@ -120,7 +120,15 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                             <li>
                                 <a class="has-arrow" href="mailbox.html" aria-expanded="false"><span class="glyphicon glyphicon-book  icon-wrap"></span> <span class="mini-click-non"><?php echo $show['NAMA_GUDANG']; ?></span></a>
                                 <ul class="submenu-angle" aria-expanded="false">
-                                    <li><a title="Bahan Masuk" href="bahan-masuk.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Bahan Masuk</span></a></li>
+                                    <li>
+                                        <a class="has-arrow" href="mailbox.html" aria-expanded="false"><span class="mini-click-non">Bahan Masuk</span></a>
+                                        <ul class="submenu-angle" aria-expanded="true">
+                                            <li><a title="Bahan Masuk" href="bahan-masuk.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">- Perhari</span></a></li>
+                                            <li><a title="Bahan Masuk Perbulan" href="bahan-masuk-perbulan.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">- Perbulan</span></a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li><a title="Bahan Rusak" href="bahan-rusak.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Bahan Rusak</span></a></li>
                                     <li><a title="Bahan Baku" href="bahan-baku.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Bahan Baku</span></a></li>
                                     <li><a title="Data Permintaan" href="data-permintaan.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Data Permintaan</span></a></li>
                                 </ul>

@@ -14,11 +14,11 @@ $CurrentDate = date("Y-m-d");
 $idGudang = $_GET['id_gudang'];
 if (isset($_GET['tanggal'])) {
     $tanggal = $_GET['tanggal'];
-} else{
+} else {
     $tanggal = date("Y-m-d");
 }
 
-//SELECT DATA BAHAN MASUK
+
 $query = mysqli_query($mysqli, "SELECT * FROM BAHAN_MASUK AS bm INNER JOIN BAHAN_BAKU AS bb ON bm.ID_BAHAN_BAKU = bb.ID_BAHAN_BAKU WHERE bm.ID_GUDANG='$idGudang' AND bm.TANGGAL = '$tanggal'") or die("data salah: " . mysqli_error($mysqli));
 
 $queryFormTambah = mysqli_query($mysqli, "SELECT * FROM BAHAN_BAKU WHERE ID_GUDANG='$idGudang'") or die("data salah: " . mysqli_error($mysqli));
@@ -123,15 +123,22 @@ $queryGudang = mysqli_query($mysqli, "SELECT * FROM GUDANG");
                 <a href="index.html"><img class="main-logo" src="../img/logo/logo.png" alt="" /></a>
                 <strong><a href="index.html"><img src="../img/logo/logosn.png" alt="" /></a></strong>
             </div>
-           <!-- Sidebar -->
-           <div class="left-custom-menu-adp-wrap comment-scrollbar">
+            <!-- Sidebar -->
+            <div class="left-custom-menu-adp-wrap comment-scrollbar">
                 <nav class="sidebar-nav left-sidebar-menu-pro">
                     <ul class="metismenu" id="menu1">
                         <?php while ($show = mysqli_fetch_array($queryGudang)) { ?>
                             <li>
                                 <a class="has-arrow" href="mailbox.html" aria-expanded="false"><span class="glyphicon glyphicon-book  icon-wrap"></span> <span class="mini-click-non"><?php echo $show['NAMA_GUDANG']; ?></span></a>
                                 <ul class="submenu-angle" aria-expanded="false">
-                                    <li><a title="Bahan Masuk" href="bahan-masuk.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Bahan Masuk</span></a></li>
+                                    <li>
+                                        <a class="has-arrow" href="mailbox.html" aria-expanded="false"><span class="mini-click-non">Bahan Masuk</span></a>
+                                        <ul class="submenu-angle" aria-expanded="true">
+                                            <li><a title="Bahan Masuk" href="bahan-masuk.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">- Perhari</span></a></li>
+                                            <li><a title="Bahan Masuk Perbulan" href="bahan-masuk-perbulan.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">- Perbulan</span></a></li>
+                                        </ul>
+                                    </li>
+
                                     <li><a title="Bahan Rusak" href="bahan-rusak.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Bahan Rusak</span></a></li>
                                     <li><a title="Bahan Baku" href="bahan-baku.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Bahan Baku</span></a></li>
                                     <li><a title="Data Permintaan" href="data-permintaan.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Data Permintaan</span></a></li>
@@ -326,8 +333,8 @@ $queryGudang = mysqli_query($mysqli, "SELECT * FROM GUDANG");
                         <div class="sparkline13-list">
                             <div class="sparkline13-hd">
                                 <div class="main-sparkline13-hd">
-                                    <h1>Bahan <span class="table-project-n">Masuk</span><span class="bread-slash"></span></h1><br>
-                                    TANGGAL : <?php echo $tanggal; ?>
+                                    <h1>Bahan <span class="table-project-n">Masuk Harian</span><span class="bread-slash"></span></h1><br>
+                                    TANGGAL : <?php echo $tanggal; ?> 
                                     <form action="" method="get">
                                         <input type="date" name="tanggal" id="tanggal">
                                         <input type="hidden" name="id_gudang" value="<?php echo $idGudang; ?>">
@@ -412,7 +419,7 @@ $queryGudang = mysqli_query($mysqli, "SELECT * FROM GUDANG");
                                                     <td><?php echo $show['TANGGAL']; ?> </td>
                                                     <td><?php echo $show['JUMLAH']; ?></td>
                                                     <td><a class="btn btn-sm btn-primary" href="edit-bahan-masuk.php?id_gudang=1"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a> &nbsp;
-                                                    <a class="btn btn-sm btn-danger" href="Proses/delete-bahan-masuk.php?id_bahan_masuk=<?php echo $show['ID_BAHAN_MASUK']; ?>&id_gudang=<?php echo $idGudang; ?>" onclick="return confirm(' Yakin Hapus?')"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                        <a class="btn btn-sm btn-danger" href="Proses/delete-bahan-masuk.php?id_bahan_masuk=<?php echo $show['ID_BAHAN_MASUK']; ?>&id_gudang=<?php echo $idGudang; ?>" onclick="return confirm(' Yakin Hapus?')"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                     </td>
                                                 </tr>
                                             <?php

@@ -4,21 +4,44 @@ if (!isset($_SESSION["username"])) {
     header("Location: ../login.php");
 }
 include "../Connection/connection.php";
-
+//GET IDUSER
 $username = $_SESSION['username'];
 $queryAdmin = mysqli_query($mysqli, "SELECT * FROM ADMIN_PUSAT where username='$username'") or die("data salah: " . mysqli_error($mysqli));
 
-
+date_default_timezone_set('Asia/Jakarta'); //MENGUBAH TIMEZONE
+$CurrentDate = date("Y-m-d");
+//GET FROM URL
 $idGudang = $_GET['id_gudang'];
+if (isset($_GET['tanggal'])) {
+    $tanggal = $_GET['tanggal'];
+} else {
+    $tanggal = date("Y-m-d");
+}
+
+
+$query = mysqli_query($mysqli, "SELECT  bb.NAMA_BAHAN,\n"
+    . "	SUM( IF( MONTH(bm.TANGGAL) = 1, bm.JUMLAH, 0) ) AS januari,\n"
+    . "	SUM( IF( MONTH(bm.TANGGAL) = 2, bm.JUMLAH, 0) ) AS februari,\n"
+    . "	SUM( IF( MONTH(bm.TANGGAL) = 3, bm.JUMLAH, 0) ) AS maret,\n"
+    . " SUM( IF( MONTH(bm.TANGGAL) = 4, bm.JUMLAH, 0) ) AS april,\n"
+    . " SUM( IF( MONTH(bm.TANGGAL) = 5, bm.JUMLAH, 0) ) AS mei,\n"
+    . " SUM( IF( MONTH(bm.TANGGAL) = 6, bm.JUMLAH, 0) ) AS juni,\n"
+    . " SUM( IF( MONTH(bm.TANGGAL) = 7, bm.JUMLAH, 0) ) AS juli,\n"
+    . " SUM( IF( MONTH(bm.TANGGAL) = 8, bm.JUMLAH, 0) ) AS agustus,\n"
+    . " SUM( IF( MONTH(bm.TANGGAL) = 9, bm.JUMLAH, 0) ) AS september,\n"
+    . " SUM( IF( MONTH(bm.TANGGAL) = 10, bm.JUMLAH, 0) ) AS oktober,\n"
+    . " SUM( IF( MONTH(bm.TANGGAL) = 11, bm.JUMLAH, 0) ) AS november,\n"
+    . " SUM( IF( MONTH(bm.TANGGAL) = 12, bm.JUMLAH, 0) ) AS desember,\n"
+    . "	SUM( jumlah) AS total\n"
+    . "FROM bahan_masuk as bm \n"
+    . "JOIN bahan_baku as bb\n"
+    . "ON bm.ID_BAHAN_BAKU = bb.ID_BAHAN_BAKU\n"
+    . "WHERE bm.id_gudang = ".$idGudang." GROUP BY bb.NAMA_BAHAN ORDER BY bb.ID_BAHAN_BAKU ASC") or die("data salah: " . mysqli_error($mysqli));
+
+$queryFormTambah = mysqli_query($mysqli, "SELECT * FROM BAHAN_BAKU WHERE ID_GUDANG='$idGudang'") or die("data salah: " . mysqli_error($mysqli));
+
 //mengambil data gudang
 $queryGudang = mysqli_query($mysqli, "SELECT * FROM GUDANG");
-
-$query = mysqli_query($mysqli, "SELECT * FROM BAHAN_BAKU where ID_GUDANG=$idGudang");
-
-$queryNamaKota =  mysqli_query($mysqli, "SELECT * FROM GUDANG where ID_GUDANG=$idGudang");
-while ($show = mysqli_fetch_array($queryNamaKota)) {
-    $namaKota = $show['NAMA_GUDANG'];
-}
 
 
 ?>
@@ -29,12 +52,19 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Bahan Baku| Tokkebi</title>
+    <title>Bahan Masuk | Tokkebi</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css" rel="stylesheet">
+
+    <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>
+
+    <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+
+
     <!-- favicon
 		============================================ -->
-    <link rel="shortcut icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
     <!-- Google Fonts
 		============================================ -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
@@ -66,7 +96,7 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
     <link rel="stylesheet" href="../css/educate-custon-icon.css">
     <!-- morrisjs CSS
 		============================================ -->
-    <link rel="stylesheet" href="../css/morris../js/morris.css">
+    <link rel="stylesheet" href="../css/morrisjs/morris.css">
     <!-- mCustomScrollbar CSS
 		============================================ -->
     <link rel="stylesheet" href="../css/scrollbar/jquery.mCustomScrollbar.min.css">
@@ -97,9 +127,6 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
     <!-- modernizr JS
 		============================================ -->
     <script src="../js/vendor/modernizr-2.8.3.min.js"></script>
-    <!-- modals CSS
-		============================================ -->
-    <link rel="stylesheet" href="../css/modals.css">
 </head>
 
 <body>
@@ -267,47 +294,47 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                     </div>
                 </div>
             </div>
-            <!-- Mobile Menu start -->
-            <div class="mobile-menu-area">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="mobile-menu">
-                                <nav id="dropdown">
-                                    <ul class="mobile-menu-nav">
-                                        <li><a data-toggle="collapse" data-target="#Tablesmob" href="#">Bahan <span class="admin-project-icon edu-icon edu-down-arrow"></span></a>
-                                            <ul id="Tablesmob" class="collapse dropdown-header-top">
-                                                <li><a href="bahan-masuk.html">Bahan Masuk</a>
-                                                </li>
-                                                <li><a href="bahan-baku.html">Bahan Baku</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
+        </div>
+        <!-- Mobile Menu start -->
+        <div class="mobile-menu-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="mobile-menu">
+                            <nav id="dropdown">
+                                <ul class="mobile-menu-nav">
+                                    <li><a data-toggle="collapse" data-target="#Tablesmob" href="#">Bahan <span class="admin-project-icon edu-icon edu-down-arrow"></span></a>
+                                        <ul id="Tablesmob" class="collapse dropdown-header-top">
+                                            <li><a href="bahan-masuk.html">Bahan Masuk</a>
+                                            </li>
+                                            <li><a href="bahan-baku.html">Bahan Baku</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Mobile Menu end -->
-            <div class="breadcome-area">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="breadcome-list single-page-breadcome">
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        </div>
+        <!-- Mobile Menu end -->
+        <div class="breadcome-area">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="breadcome-list single-page-breadcome">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                        <ul class="breadcome-menu">
-                                            <li><a href="#">Bahan</a> <span class="bread-slash">/</span>
-                                            </li>
-                                            <li><span class="bread-blod">Bahan Baku</span>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <ul class="breadcome-menu">
+                                        <li><a href="#">Bahan</a> <span class="bread-slash">/</span>
+                                        </li>
+                                        <li><span class="bread-blod">Bahan Masuk</span>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -323,60 +350,109 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                         <div class="sparkline13-list">
                             <div class="sparkline13-hd">
                                 <div class="main-sparkline13-hd">
-                                    <h1>Bahan <span class="table-project-n">Baku</span></h1>
+                                    <h1>Bahan <span class="table-project-n">Masuk Bulanan</span><span class="bread-slash"></span></h1><br>
+                                   
+                                    <a class="btn btn-sm btn-primary" href="#" data-toggle="modal" data-target="#DangerModalalert">Tambah Bahan Masuk</a>
+                                    <div id="DangerModalalert" class="modal modal-edu-general FullColor-popup-DangerModal fade" role="dialog">
+                                        <form action="proses/add-bahan-masuk.php?id_gudang=<?php echo $idGudang; ?>" method="post" class="dropzone dropzone-custom needsclick add-professor">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-close-area modal-close-df">
+                                                        <a class="close" data-dismiss="modal" href="#"><i class="fa fa-close"></i></a>
+                                                    </div>
+                                                    <div class="modal-body col-md-12">
+                                                        <h3>Tambah Bahan Masuk</h3>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <p><b>Tanggal</b></p>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <h5><?php echo $CurrentDate; ?></h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <p><b>Nama Bahan</b></p>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <select name="id_bahan" id="id_bahan">
+                                                                    <?php
+                                                                    while ($show = mysqli_fetch_array($queryFormTambah)) {
+                                                                        $index++; ?>
+                                                                        <option value="<?php echo $show['ID_BAHAN_BAKU']; ?>"><?php echo $show['NAMA_BAHAN']; ?></option>
+                                                                    <?php } ?>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <p><b>Jumlah</b></p>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <input type="number" name="jumlah">
+                                                                <input type="hidden" name="tanggal" value="<?php echo $CurrentDate; ?>">
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+                                                    <div class="modal-footer danger-md">
+                                                        <input class="btn btn-primary" type="submit" name="submit" value="Submit">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                             <div class="sparkline13-graph">
-                                <a class="btn btn-sm btn-primary" href="add-bahan-baku.php?id_gudang=<?php echo $idGudang; ?>">Tambah Barang</a>
                                 <div class="datatable-dashv1-list custom-datatable-overright">
-                                    <table id="table" data-toggle="table" data-pagination="true" data-search="true" data-show-columns="true" data-show-pagination-switch="true" data-show-refresh="true" data-key-events="true" data-show-toggle="true" data-resizable="true" data-cookie="true" data-cookie-id-table="saveId" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar">
+                                    <table id="table" data-filter-control="true" data-sortable="true" data-url="json/data1.json" data-toggle="table" data-pagination="true" data-search="true" data-show-columns="true" data-show-pagination-switch="true" data-show-refresh="true" data-key-events="true" data-show-toggle="true" data-resizable="true" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar">
                                         <thead>
                                             <tr>
                                                 <th data-field="id">No</th>
-                                                <th data-field="namaBahan">Nama Bahan</th>
-                                                <th data-field="satuan">Satuan</th>
-                                                <th data-field="harga">Harga</th>
-                                                <th data-field="biayaTambahan">Biaya Tambahan</th>
-                                                <th data-field="Margin">Margin</th>
-                                                <th data-field="hargaJual">Harga Jual</th>
-                                                <th data-field="stokAwal">Stok Awal</th>
-                                                <th data-field="barangMasuk">Barang Masuk</th>
-                                                <th data-field="barangRusak">Barang Rusak</th>
-                                                <th data-field="barangKeluar">Barang Keluar</th>
-                                                <th data-field="sisaStok">Sisa Stok</th>
-                                                <th data-field="nilai">Nilai</th>
-                                                <th data-field="action">Action</th>
+                                                <th data-field="name" data-filter-control="input">Nama Bahan</th>
+                                                <th data-field="januari">januari</th>
+                                                <th data-field="februari">februari</th>
+                                                <th data-field="maret">maret</th>
+                                                <th data-field="april">april</th>
+                                                <th data-field="mei">mei</th>
+                                                <th data-field="juni">juni</th>
+                                                <th data-field="juli">juli</th>
+                                                <th data-field="agustus">agustus</th>
+                                                <th data-field="september">september</th>
+                                                <th data-field="oktober">oktober</th>
+                                                <th data-field="november">november</th>
+                                                <th data-field="desember">desember</th>
+                                                <th data-field="jumlah" data-sortable="true">Jumlah</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
                                             $index = 0;
                                             while ($show = mysqli_fetch_array($query)) {
-                                                $namaBahan = $show['NAMA_BAHAN'];
-                                                $idBahanBaku = $show['ID_BAHAN_BAKU'];
                                                 $index++; ?>
                                                 <tr>
                                                     <td><?php echo $index; ?></td>
                                                     <td><?php echo $show['NAMA_BAHAN']; ?></td>
-                                                    <td><?php echo $show['SATUAN']; ?></td>
-                                                    <td><?php echo $show['HARGA']; ?></td>
-                                                    <td><?php echo $show['BIAYA_TAMBAHAN']; ?></td>
-                                                    <td><?php echo $show['MARGIN']; ?></td>
-                                                    <td>Rp. <?php echo $show['HARGA_JUAL']; ?></td>
-                                                    <td><?php echo $show['STOK_AWAL']; ?></td>
-                                                    <td><?php echo $show['BARANG_MASUK']; ?></td>
-                                                    <td><?php echo $show['BARANG_RUSAK']; ?></td>
-                                                    <td><?php echo $show['BARANG_KELUAR']; ?></td>
-                                                    <td><?php echo $show['SISA_STOK']; ?></td>
-                                                    <td>Rp. <?php echo $show['NILAI']; ?></td>
-                                                    <td><a class="btn btn-sm btn-primary" href="edit-bahan-baku.php?id_bahan_baku=<?php echo $idBahanBaku; ?>&id_gudang=<?php echo $show['ID_GUDANG']; ?>"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                                                        <a class="btn btn-sm btn-danger" href="Proses/delete-bahan-baku.php?id_bahan_baku=<?php echo $idBahanBaku; ?>&id_gudang=<?php echo $idGudang; ?>" onclick="return confirm(' Yakin Hapus <?php echo $namaBahan; ?>?')"><i class="fa fa-trash" aria-hidden="true"></i></a>
-                                                    </td>
-                                                <?php } ?>
+                                                    <td><?php echo $show['januari']; ?></td>
+                                                    <td><?php echo $show['februari']; ?> </td>
+                                                    <td><?php echo $show['maret']; ?></td>
+                                                    <td><?php echo $show['april']; ?></td>
+                                                    <td><?php echo $show['mei']; ?></td>
+                                                    <td><?php echo $show['juni']; ?></td>
+                                                    <td><?php echo $show['juli']; ?></td>
+                                                    <td><?php echo $show['agustus']; ?></td>
+                                                    <td><?php echo $show['september']; ?></td>
+                                                    <td><?php echo $show['oktober']; ?></td>
+                                                    <td><?php echo $show['november']; ?></td>
+                                                    <td><?php echo $show['desember']; ?></td>
+                                                    <td><?php echo $show['total'] ?></td>
                                                 </tr>
+                                            <?php
+                                            } ?>
                                         </tbody>
                                     </table>
-
                                 </div>
                             </div>
                         </div>

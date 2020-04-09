@@ -1,0 +1,2 @@
+ini query perbulan
+SELECT bb.nama_bahan, MONTH(tanggal) AS bulan, SUM(jumlah) AS jumlah_bulanan FROM bahan_masuk as bm JOIN bahan_baku as bb on bm.ID_BAHAN_BAKU = bb.ID_BAHAN_BAKU GROUP BY bb.NAMA_BAHAN

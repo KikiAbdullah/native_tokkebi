@@ -28,77 +28,89 @@ $data = mysqli_query($mysqli, "SELECT * FROM FAKTUR AS fk INNER JOIN BAHAN_BAKU 
   <title>FAKTUR</title>
   <!-- favicon
 		============================================ -->
-    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
 </head>
 
 <body>
   <div class="container-fluid" style="border: ridge">
+    <!-- TITLE -->
     <div class="row">
       <div class="col-md-12">
         <p style="text-align: center"><b>FAKTUR</b></p>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-8">
-        <p><b>Tanggal : <?php echo $tanggal; ?></b></p>
-      </div>
-      <div class="col-md-4">
-        <p><b><?php echo $namaGudang; ?> / <?php echo $namaMitra; ?> </b></p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-8">
-        <br><br>
-        <p>Perum. Griya Shanta Blok K No. 204 <br>
-          Kec. Lowokwaru, Kota Malang <br>
-          Telp : 085246359510 / 082232929202</p>
-      </div>
-      <div class="col-md-4">
-        <img src="img/logo/logo.png" width="150px">
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-8">
+          <p><b>Tanggal : <?php echo $tanggal; ?></b></p>
+        </div>
+        <div class="col-md-4">
+          <p><b><?php echo $namaGudang; ?> / <?php echo $namaMitra; ?> </b></p>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-12">
-        <table class="table" border="1">
-          <thead>
-            <th>No</th>
-            <th>Nama Barang</th>
-            <th>Qty</th>
-            <th>Harga</th>
-            <th>Jumlah</th>
-          </thead>
-          <tbody>
-            <?php
-            $index = $totalHarga = 0;
-            while ($show = mysqli_fetch_array($data)) {
-              $index++;
-              $total = $show['TOTAL_HARGA'];
-              $totalHarga = $totalHarga + $total; ?>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-8">
+          <br><br>
+          <p>Perum. Griya Shanta Blok K No. 204 <br>
+            Kec. Lowokwaru, Kota Malang <br>
+            Telp : 085246359510 / 082232929202</p>
+        </div>
+        <div class="col-md-4">
+          <img src="img/logo/logo.png" width="150px">
+        </div>
+      </div>
+    </div>
+    <!-- TABLE -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table" border="1">
+            <thead>
+              <th>No</th>
+              <th>Nama Barang</th>
+              <th>Qty</th>
+              <th>Harga</th>
+              <th>Jumlah</th>
+            </thead>
+            <tbody>
+              <?php
+              $index = $totalHarga = 0;
+              while ($show = mysqli_fetch_array($data)) {
+                $index++;
+                $total = $show['TOTAL_HARGA'];
+                $totalHarga = $totalHarga + $total; ?>
+                <tr>
+                  <td><?php echo $index; ?></td>
+                  <td><?php echo $show['NAMA_BAHAN']; ?></td>
+                  <td><?php echo $show['QTY']; ?> <?php echo $show['SATUAN']; ?></td>
+                  <td>Rp. <?php echo $show['HARGA_JUAL']; ?></td>
+                  <td>Rp. <?php echo $total; ?></td>
+                </tr>
+              <?php } ?>
               <tr>
-                <td><?php echo $index; ?></td>
-                <td><?php echo $show['NAMA_BAHAN']; ?></td>
-                <td><?php echo $show['QTY']; ?> <?php echo $show['SATUAN']; ?></td>
-                <td>Rp. <?php echo $show['HARGA_JUAL']; ?></td>
-                <td>Rp. <?php echo $total; ?></td>
+                <td colspan="4"> <b>Total Harga</b></td>
+                <td>Rp. <?php echo $totalHarga; ?></td>
               </tr>
-            <?php } ?>
-            <tr>
-              <td colspan="4"> <b>Total Harga</b></td>
-              <td>Rp. <?php echo $totalHarga; ?></td>
-            </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-8">
-        <p>Pembarayan dilakukan melalui: <br>
-          BCA : 3151126420 a/n Kurnia Yuliastri <br>
-          BRI : 624101008303533 a/n Kurnia Yuliastri <br>
-          MANDIRI : 1440018078961 a/n Kurnia Yuliastri <br>
-          BNI : 0192318217 a/n Yasir Sani</p>
-      </div>
-      <div class="col-md-4">
+    <!-- FOOTER -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-8">
+          <p>Pembarayan dilakukan melalui: <br>
+            BCA : 3151126420 a/n Kurnia Yuliastri <br>
+            BRI : 624101008303533 a/n Kurnia Yuliastri <br>
+            MANDIRI : 1440018078961 a/n Kurnia Yuliastri <br>
+            BNI : 0192318217 a/n Yasir Sani</p>
+        </div>
+        <div class="col-md-4">
+        </div>
       </div>
     </div>
   </div>
