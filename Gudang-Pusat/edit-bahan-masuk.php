@@ -5,21 +5,35 @@ if (!isset($_SESSION["username"])) {
 }
 include "../Connection/connection.php";
 
-
 $username = $_SESSION['username'];
 $queryAdmin = mysqli_query($mysqli, "SELECT * FROM ADMIN_PUSAT where username='$username'") or die("data salah: " . mysqli_error($mysqli));
 
+
+$idGudang = $_GET['id_gudang'];
+$idBahanMasuk = $_GET['id_bahan_masuk'];
+
 //mengambil data gudang
-$queryGudang = mysqli_query($mysqli, "SELECT * FROM gudang");
+$queryGudang = mysqli_query($mysqli, "SELECT * FROM GUDANG");
 
-$id_gudang = $_GET['id_gudang'];
+$query = mysqli_query($mysqli, "SELECT * FROM bahan_masuk as bm JOIN bahan_baku as bb ON bm.ID_BAHAN_BAKU = bb.ID_BAHAN_BAKU where bm.ID_GUDANG=$idGudang AND bm.ID_BAHAN_MASUK=$idBahanMasuk");
 
-
-$queryNamaKota =  mysqli_query($mysqli, "SELECT * FROM gudang where id_gudang=$id_gudang");
+$queryNamaKota =  mysqli_query($mysqli, "SELECT * FROM GUDANG where ID_GUDANG=$idGudang");
 while ($show = mysqli_fetch_array($queryNamaKota)) {
     $namaKota = $show['NAMA_GUDANG'];
 }
 
+
+if (isset($_POST['submit'])) {
+    $idGudang = $_GET['id_gudang'];
+    $tanggal = $_POST['tanggal'];
+    $jumlah = $_POST['jumlah'];
+    
+
+
+    $query =  mysqli_query($mysqli, "UPDATE `bahan_masuk` SET `TANGGAL`='$tanggal',`JUMLAH`='$jumlah' WHERE ID_BAHAN_MASUK='$idBahanMasuk'") or die("data salah: " . mysqli_error($mysqli));
+
+    header("Location: bahan-masuk.php?id_gudang=$idGudang&tanggal=$tanggal");
+}
 ?>
 
 <!doctype html>
@@ -28,7 +42,7 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Bahan Baku| Tokkebi</title>
+    <title>Bahan Baku | Tokkebi</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- favicon
@@ -109,8 +123,8 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                 <a href="index.html"><img class="main-logo" src="../img/logo/logo.png" alt="" /></a>
                 <strong><a href="index.html"><img src="../img/logo/logosn.png" alt="" /></a></strong>
             </div>
-             <!-- Sidebar -->
-             <div class="left-custom-menu-adp-wrap comment-scrollbar">
+            <!-- Sidebar -->
+            <div class="left-custom-menu-adp-wrap comment-scrollbar">
                 <nav class="sidebar-nav left-sidebar-menu-pro">
                     <ul class="metismenu" id="menu1">
                         <?php while ($show = mysqli_fetch_array($queryGudang)) { ?>
@@ -305,7 +319,7 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                                         <ul class="breadcome-menu">
                                             <li><a href="">Bahan</a> <span class="bread-slash">/</span>
                                             </li>
-                                            <li><span class="bread-blod">Tambah Bahan Baku</span>
+                                            <li><span class="bread-blod">Edit Bahan Baku</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -322,7 +336,7 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="product-payment-inner-st">
                             <ul id="myTabedu1" class="tab-review-design">
-                                <li class="active"><a href="#description">Tambah Bahan Baku</a></li>
+                                <li class="active"><a href="#description">Edit Bahan Baku</a></li>
                             </ul>
                             <div id="myTabContent" class="tab-content custom-product-edit">
                                 <div class="product-tab-list tab-pane fade active in" id="description">
@@ -330,68 +344,39 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                             <div class="review-content-section">
                                                 <div id="dropzone1" class="pro-ad">
-                                                    <form action="" class="dropzone dropzone-custom needsclick add-professors" id="demo1-upload" method="POST">
-                                                        <div class="row">
-                                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="form-group">
-                                                                    <label for="namaBahan">Nama Bahan</label>
-                                                                    <input name="namaBahan" type="text" class="form-control" placeholder="Nama Bahan">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="satuan">Satuan</label>
-                                                                    <input name="satuan" type="text" class="form-control" placeholder="Satuan">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="harga">Harga</label>
-                                                                    <input name="harga" type="text" class="form-control" placeholder="Harga">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="biayaTambahan">Biaya Tambahan</label>
-                                                                    <input name="biayaTambahan" type="text" class="form-control" placeholder="Biaya Tambahan">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="margin">Margin</label>
-                                                                    <input name="margin" type="text" class="form-control" placeholder="Margin">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="hargaJual">Harga Jual</label>
-                                                                    <input name="hargaJual" type="text" class="form-control" placeholder="Harga Jual">
+
+                                                    <form action="" class="dropzone dropzone-custom needsclick add-professors" id="demo1-upload" method="post">
+                                                        <?php
+                                                        while ($show = mysqli_fetch_array($query)) { ?>
+                                                            <div class="row">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                    <div class="form-group">
+                                                                        <label for="namaBahan">Nama Bahan</label>
+                                                                        <input name="namaBahan" type="text" class="form-control" value="<?php echo $show['NAMA_BAHAN']; ?>" readonly>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="satuan">Satuan</label>
+                                                                        <input name="satuan" type="text" class="form-control" value="<?php echo $show['SATUAN']; ?>" re>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="tanggal">Tanggal</label>
+                                                                        <input name="tanggal" type="date" class="form-control" value="<?php echo $show['TANGGAL']; ?>">
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="jumlah">Jumlah</label>
+                                                                        <input name="jumlah" type="number" class="form-control" value="<?php echo $show['JUMLAH']; ?>">
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="form-group">
-                                                                    <label for="stokAwal">Stok Awal</label>
-                                                                    <input name="stokAwal" type="text" class="form-control" placeholder="Stok Awal">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="barangMasuk">Barang Masuk</label>
-                                                                    <input name="barangMasuk" type="text" class="form-control" placeholder="Barang Masuk">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="barangRusak">Barang Rusak</label>
-                                                                    <input name="barangRusak" type="text" class="form-control" placeholder="Barang Rusak">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="barangKeluar">Barang Keluar</label>
-                                                                    <input name="barangKeluar" type="text" class="form-control" placeholder="Barang Keluar">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="sisaStok">Sisa Stok</label>
-                                                                    <input name="sisaStok" type="text" class="form-control" placeholder="Sisa Stok">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="nilai">Nilai</label>
-                                                                    <input name="nilai" type="text" class="form-control" placeholder="Nilai">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div class="payment-adress">
+                                                                        <button type="submit" name="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                                                                        <a class="btn btn-primary waves-effect waves-light" href="bahan-masuk.php?id_gudang=<?php echo $idGudang ?>&tanggal=<?php echo $tanggal; ?>">Back</a>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-lg-12">
-                                                                <div class="payment-adress">
-                                                                    <input type="submit" name="submit" class="btn btn-primary waves-effect waves-light"></input>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        <?php } ?>
                                                     </form>
                                                 </div>
                                             </div>
@@ -484,28 +469,3 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
 </body>
 
 </html>
-
-<?php
-if (isset($_POST['submit'])) {
-    $id_gudang = $_GET['id_gudang'];
-    $namaBahan = $_POST['namaBahan'];
-    $satuan = $_POST['satuan'];
-    $harga = $_POST['harga'];
-    $biayaTambahan = $_POST['biayaTambahan'];
-    $margin = $_POST['margin'];
-    $hargaJual = $_POST['hargaJual'];
-    $stokAwal = $_POST['stokAwal'];
-    $barangMasuk = $_POST['barangMasuk'];
-    $barangRusak = $_POST['barangRusak'];
-    $barangKeluar = $_POST['barangKeluar'];
-    $sisaStok = $_POST['sisaStok'];
-    $nilai = $_POST['nilai'];
-
-
-    $query =  mysqli_query($mysqli, "INSERT INTO `bahan_baku`(`ID_GUDANG`, `NAMA_BAHAN`, `SATUAN`, `HARGA`, `BIAYA_TAMBAHAN`, `MARGIN`, `HARGA_JUAL`, `STOK_AWAL`, `BARANG_MASUK`, `BARANG_RUSAK`, `BARANG_KELUAR`, `SISA_STOK`, `NILAI`) VALUES ('$id_gudang', '$namaBahan', '$satuan', '$harga', '$biayaTambahan', '$margin', '$hargaJual', '$stokAwal', '$barangMasuk', '$barangRusak', '$barangKeluar', '$sisaStok', '$nilai')");
-
-    header("Location: bahan-baku.php?id_gudang=$id_gudang");
-}
-
-
-?>

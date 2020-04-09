@@ -4,21 +4,49 @@ if (!isset($_SESSION["username"])) {
     header("Location: ../login.php");
 }
 include "../Connection/connection.php";
-
-
+//GET IDUSER
 $username = $_SESSION['username'];
 $queryAdmin = mysqli_query($mysqli, "SELECT * FROM ADMIN_PUSAT where username='$username'") or die("data salah: " . mysqli_error($mysqli));
 
-//mengambil data gudang
-$queryGudang = mysqli_query($mysqli, "SELECT * FROM gudang");
-
-$id_gudang = $_GET['id_gudang'];
-
-
-$queryNamaKota =  mysqli_query($mysqli, "SELECT * FROM gudang where id_gudang=$id_gudang");
-while ($show = mysqli_fetch_array($queryNamaKota)) {
-    $namaKota = $show['NAMA_GUDANG'];
+date_default_timezone_set('Asia/Jakarta'); //MENGUBAH TIMEZONE
+$CurrentDate = date("Y-m-d");
+//GET FROM URL
+$idGudang = $_GET['id_gudang'];
+if (isset($_GET['tanggal'])) {
+    $tanggal = $_GET['tanggal'];
+} else {
+    $tanggal = date("Y-m-d");
 }
+
+
+$query = mysqli_query($mysqli, "SELECT  bb.NAMA_BAHAN,\n"
+    . "	SUM( IF( MONTH(fk.TANGGAL) = 1, fk.QTY, 0) ) AS januari,\n"
+    . "	SUM( IF( MONTH(fk.TANGGAL) = 2, fk.QTY, 0) ) AS februari,\n"
+    . "	SUM( IF( MONTH(fk.TANGGAL) = 3, fk.QTY, 0) ) AS maret,\n"
+    . " SUM( IF( MONTH(fk.TANGGAL) = 4, fk.QTY, 0) ) AS april,\n"
+    . " SUM( IF( MONTH(fk.TANGGAL) = 5, fk.QTY, 0) ) AS mei,\n"
+    . " SUM( IF( MONTH(fk.TANGGAL) = 6, fk.QTY, 0) ) AS juni,\n"
+    . " SUM( IF( MONTH(fk.TANGGAL) = 7, fk.QTY, 0) ) AS juli,\n"
+    . " SUM( IF( MONTH(fk.TANGGAL) = 8, fk.QTY, 0) ) AS agustus,\n"
+    . " SUM( IF( MONTH(fk.TANGGAL) = 9, fk.QTY, 0) ) AS september,\n"
+    . " SUM( IF( MONTH(fk.TANGGAL) = 10, fk.QTY, 0) ) AS oktober,\n"
+    . " SUM( IF( MONTH(fk.TANGGAL) = 11, fk.QTY, 0) ) AS november,\n"
+    . " SUM( IF( MONTH(fk.TANGGAL) = 12, fk.QTY, 0) ) AS desember,\n"
+    . "	SUM( QTY) AS total\n"
+    . "FROM faktur as fk \n"
+    . "JOIN bahan_baku as bb\n"
+    . "ON fk.ID_BAHAN_BAKU = bb.ID_BAHAN_BAKU\n"
+    . "JOIN mitra as mt\n"
+    . "ON fk.ID_MITRA = mt.ID_MITRA\n"
+    . "JOIN gudang as gd\n"
+    . "ON mt.ID_GUDANG = gd.ID_GUDANG\n"
+    . "WHERE gd.ID_GUDANG = ".$idGudang." GROUP BY bb.NAMA_BAHAN ORDER BY bb.ID_BAHAN_BAKU ASC") or die("data salah: " . mysqli_error($mysqli));
+
+$queryFormTambah = mysqli_query($mysqli, "SELECT * FROM BAHAN_BAKU WHERE ID_GUDANG='$idGudang'") or die("data salah: " . mysqli_error($mysqli));
+
+//mengambil data gudang
+$queryGudang = mysqli_query($mysqli, "SELECT * FROM GUDANG");
+
 
 ?>
 
@@ -28,12 +56,19 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Bahan Baku| Tokkebi</title>
+    <title>Bahan Keluar Perbulan | Tokkebi</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css" rel="stylesheet">
+
+    <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>
+
+    <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+
+
     <!-- favicon
 		============================================ -->
-    <link rel="shortcut icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
     <!-- Google Fonts
 		============================================ -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
@@ -109,8 +144,9 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                 <a href="index.html"><img class="main-logo" src="../img/logo/logo.png" alt="" /></a>
                 <strong><a href="index.html"><img src="../img/logo/logosn.png" alt="" /></a></strong>
             </div>
-             <!-- Sidebar -->
-             <div class="left-custom-menu-adp-wrap comment-scrollbar">
+            <!-- Sidebar -->
+           <!-- Sidebar -->
+           <div class="left-custom-menu-adp-wrap comment-scrollbar">
                 <nav class="sidebar-nav left-sidebar-menu-pro">
                     <ul class="metismenu" id="menu1">
                         <?php while ($show = mysqli_fetch_array($queryGudang)) { ?>
@@ -140,6 +176,7 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                     </ul>
                 </nav>
             </div>
+            <!-- Sidebar -->
             <!-- Sidebar -->
         </nav>
     </div>
@@ -268,135 +305,47 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                     </div>
                 </div>
             </div>
-            <!-- Mobile Menu start -->
-            <div class="mobile-menu-area">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="mobile-menu">
-                                <nav id="dropdown">
-                                    <ul class="mobile-menu-nav">
-                                        <li><a data-toggle="collapse" data-target="#Tablesmob" href="#">Bahan <span class="admin-project-icon edu-icon edu-down-arrow"></span></a>
-                                            <ul id="Tablesmob" class="collapse dropdown-header-top">
-                                                <li><a href="bahan-masuk.html">Bahan Masuk</a>
-                                                </li>
-                                                <li><a href="bahan-baku.html">Bahan Baku</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Mobile Menu end -->
-            <div class="breadcome-area">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="breadcome-list single-page-breadcome">
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                        <ul class="breadcome-menu">
-                                            <li><a href="">Bahan</a> <span class="bread-slash">/</span>
+        </div>
+        <!-- Mobile Menu start -->
+        <div class="mobile-menu-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="mobile-menu">
+                            <nav id="dropdown">
+                                <ul class="mobile-menu-nav">
+                                    <li><a data-toggle="collapse" data-target="#Tablesmob" href="#">Bahan <span class="admin-project-icon edu-icon edu-down-arrow"></span></a>
+                                        <ul id="Tablesmob" class="collapse dropdown-header-top">
+                                            <li><a href="bahan-masuk.html">Bahan Masuk</a>
                                             </li>
-                                            <li><span class="bread-blod">Tambah Bahan Baku</span>
+                                            <li><a href="bahan-baku.html">Bahan Baku</a>
                                             </li>
                                         </ul>
-                                    </div>
-                                </div>
-                            </div>
+                                    </li>
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="single-pro-review-area mt-t-30 mg-b-15">
+        <!-- Mobile Menu end -->
+        <div class="breadcome-area">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                        <div class="product-payment-inner-st">
-                            <ul id="myTabedu1" class="tab-review-design">
-                                <li class="active"><a href="#description">Tambah Bahan Baku</a></li>
-                            </ul>
-                            <div id="myTabContent" class="tab-content custom-product-edit">
-                                <div class="product-tab-list tab-pane fade active in" id="description">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="review-content-section">
-                                                <div id="dropzone1" class="pro-ad">
-                                                    <form action="" class="dropzone dropzone-custom needsclick add-professors" id="demo1-upload" method="POST">
-                                                        <div class="row">
-                                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="form-group">
-                                                                    <label for="namaBahan">Nama Bahan</label>
-                                                                    <input name="namaBahan" type="text" class="form-control" placeholder="Nama Bahan">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="satuan">Satuan</label>
-                                                                    <input name="satuan" type="text" class="form-control" placeholder="Satuan">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="harga">Harga</label>
-                                                                    <input name="harga" type="text" class="form-control" placeholder="Harga">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="biayaTambahan">Biaya Tambahan</label>
-                                                                    <input name="biayaTambahan" type="text" class="form-control" placeholder="Biaya Tambahan">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="margin">Margin</label>
-                                                                    <input name="margin" type="text" class="form-control" placeholder="Margin">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="hargaJual">Harga Jual</label>
-                                                                    <input name="hargaJual" type="text" class="form-control" placeholder="Harga Jual">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="form-group">
-                                                                    <label for="stokAwal">Stok Awal</label>
-                                                                    <input name="stokAwal" type="text" class="form-control" placeholder="Stok Awal">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="barangMasuk">Barang Masuk</label>
-                                                                    <input name="barangMasuk" type="text" class="form-control" placeholder="Barang Masuk">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="barangRusak">Barang Rusak</label>
-                                                                    <input name="barangRusak" type="text" class="form-control" placeholder="Barang Rusak">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="barangKeluar">Barang Keluar</label>
-                                                                    <input name="barangKeluar" type="text" class="form-control" placeholder="Barang Keluar">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="sisaStok">Sisa Stok</label>
-                                                                    <input name="sisaStok" type="text" class="form-control" placeholder="Sisa Stok">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="nilai">Nilai</label>
-                                                                    <input name="nilai" type="text" class="form-control" placeholder="Nilai">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-lg-12">
-                                                                <div class="payment-adress">
-                                                                    <input type="submit" name="submit" class="btn btn-primary waves-effect waves-light"></input>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <div class="breadcome-list single-page-breadcome">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <ul class="breadcome-menu">
+                                        <li><a href="#">Bahan</a> <span class="bread-slash">/</span>
+                                        </li>
+                                        <li><span class="bread-blod">Bahan Masuk</span>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -404,6 +353,125 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
                 </div>
             </div>
         </div>
+        <!-- Static Table Start -->
+        <div class="data-table-area mg-b-15">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="sparkline13-list">
+                            <div class="sparkline13-hd">
+                                <div class="main-sparkline13-hd">
+                                    <h1>Bahan <span class="table-project-n">Keluar Bulanan</span><span class="bread-slash"></span></h1><br>
+                                   
+                                    <a class="btn btn-sm btn-primary" href="#" data-toggle="modal" data-target="#DangerModalalert">Tambah Bahan Masuk</a>
+                                    <div id="DangerModalalert" class="modal modal-edu-general FullColor-popup-DangerModal fade" role="dialog">
+                                        <form action="proses/add-bahan-masuk.php?id_gudang=<?php echo $idGudang; ?>" method="post" class="dropzone dropzone-custom needsclick add-professor">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-close-area modal-close-df">
+                                                        <a class="close" data-dismiss="modal" href="#"><i class="fa fa-close"></i></a>
+                                                    </div>
+                                                    <div class="modal-body col-md-12">
+                                                        <h3>Tambah Bahan Masuk</h3>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <p><b>Tanggal</b></p>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <h5><?php echo $CurrentDate; ?></h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <p><b>Nama Bahan</b></p>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <select name="id_bahan" id="id_bahan">
+                                                                    <?php
+                                                                    while ($show = mysqli_fetch_array($queryFormTambah)) {
+                                                                        $index++; ?>
+                                                                        <option value="<?php echo $show['ID_BAHAN_BAKU']; ?>"><?php echo $show['NAMA_BAHAN']; ?></option>
+                                                                    <?php } ?>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <p><b>Jumlah</b></p>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <input type="number" name="jumlah">
+                                                                <input type="hidden" name="tanggal" value="<?php echo $CurrentDate; ?>">
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+                                                    <div class="modal-footer danger-md">
+                                                        <input class="btn btn-primary" type="submit" name="submit" value="Submit">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sparkline13-graph">
+                                <div class="datatable-dashv1-list custom-datatable-overright">
+                                    <table id="table" data-filter-control="true" data-sortable="true" data-url="json/data1.json" data-toggle="table" data-pagination="true" data-search="true" data-show-columns="true" data-show-pagination-switch="true" data-show-refresh="true" data-key-events="true" data-show-toggle="true" data-resizable="true" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar">
+                                        <thead>
+                                            <tr>
+                                                <th data-field="id">No</th>
+                                                <th data-field="name" data-filter-control="input">Nama Bahan</th>
+                                                <th data-field="januari">januari</th>
+                                                <th data-field="februari">februari</th>
+                                                <th data-field="maret">maret</th>
+                                                <th data-field="april">april</th>
+                                                <th data-field="mei">mei</th>
+                                                <th data-field="juni">juni</th>
+                                                <th data-field="juli">juli</th>
+                                                <th data-field="agustus">agustus</th>
+                                                <th data-field="september">september</th>
+                                                <th data-field="oktober">oktober</th>
+                                                <th data-field="november">november</th>
+                                                <th data-field="desember">desember</th>
+                                                <th data-field="jumlah" data-sortable="true">Jumlah</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $index = 0;
+                                            while ($show = mysqli_fetch_array($query)) {
+                                                $index++; ?>
+                                                <tr>
+                                                    <td><?php echo $index; ?></td>
+                                                    <td><?php echo $show['NAMA_BAHAN']; ?></td>
+                                                    <td><?php echo $show['januari']; ?></td>
+                                                    <td><?php echo $show['februari']; ?> </td>
+                                                    <td><?php echo $show['maret']; ?></td>
+                                                    <td><?php echo $show['april']; ?></td>
+                                                    <td><?php echo $show['mei']; ?></td>
+                                                    <td><?php echo $show['juni']; ?></td>
+                                                    <td><?php echo $show['juli']; ?></td>
+                                                    <td><?php echo $show['agustus']; ?></td>
+                                                    <td><?php echo $show['september']; ?></td>
+                                                    <td><?php echo $show['oktober']; ?></td>
+                                                    <td><?php echo $show['november']; ?></td>
+                                                    <td><?php echo $show['desember']; ?></td>
+                                                    <td><?php echo $show['total'] ?></td>
+                                                </tr>
+                                            <?php
+                                            } ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Static Table End -->
         <div class="footer-copyright-area">
             <div class="container-fluid">
                 <div class="row">
@@ -484,28 +552,3 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
 </body>
 
 </html>
-
-<?php
-if (isset($_POST['submit'])) {
-    $id_gudang = $_GET['id_gudang'];
-    $namaBahan = $_POST['namaBahan'];
-    $satuan = $_POST['satuan'];
-    $harga = $_POST['harga'];
-    $biayaTambahan = $_POST['biayaTambahan'];
-    $margin = $_POST['margin'];
-    $hargaJual = $_POST['hargaJual'];
-    $stokAwal = $_POST['stokAwal'];
-    $barangMasuk = $_POST['barangMasuk'];
-    $barangRusak = $_POST['barangRusak'];
-    $barangKeluar = $_POST['barangKeluar'];
-    $sisaStok = $_POST['sisaStok'];
-    $nilai = $_POST['nilai'];
-
-
-    $query =  mysqli_query($mysqli, "INSERT INTO `bahan_baku`(`ID_GUDANG`, `NAMA_BAHAN`, `SATUAN`, `HARGA`, `BIAYA_TAMBAHAN`, `MARGIN`, `HARGA_JUAL`, `STOK_AWAL`, `BARANG_MASUK`, `BARANG_RUSAK`, `BARANG_KELUAR`, `SISA_STOK`, `NILAI`) VALUES ('$id_gudang', '$namaBahan', '$satuan', '$harga', '$biayaTambahan', '$margin', '$hargaJual', '$stokAwal', '$barangMasuk', '$barangRusak', '$barangKeluar', '$sisaStok', '$nilai')");
-
-    header("Location: bahan-baku.php?id_gudang=$id_gudang");
-}
-
-
-?>

@@ -10,7 +10,7 @@ $username = $_SESSION['username'];
 $queryAdmin = mysqli_query($mysqli, "SELECT * FROM admin_pusat where USERNAME = '$username';") or die("data salah: " . mysqli_error($mysqli));
 
 $namaAdmin = $email = $telp = null;
-$query =  mysqli_query($mysqli, "UPDATE `admin_pusat` SET `nama_admin_pusat`='$namaAdmin',`username`='$username' WHERE `username`='$username'")or die("data salah: " . mysqli_error($mysqli));
+$query =  mysqli_query($mysqli, "UPDATE `admin_pusat` SET `nama_admin_pusat`='$namaAdmin',`username`='$username' WHERE `username`='$username'") or die("data salah: " . mysqli_error($mysqli));
 $id_gudang = $_GET['id_gudang'];
 if (isset($_POST['simpan'])) {
     $id_gudang = $_GET['id_gudang'];
@@ -27,7 +27,6 @@ while ($show = mysqli_fetch_array($queryAdmin)) {
     $username = $show['USERNAME'];
     $email = $show['EMAIL'];
     $telp = $show['TELP'];
-
 }
 ?>
 <!doctype html>
@@ -128,6 +127,7 @@ while ($show = mysqli_fetch_array($queryAdmin)) {
                             <li>
                                 <a class="has-arrow" href="mailbox.html" aria-expanded="false"><span class="glyphicon glyphicon-book  icon-wrap"></span> <span class="mini-click-non"><?php echo $show['NAMA_GUDANG']; ?></span></a>
                                 <ul class="submenu-angle" aria-expanded="false">
+                                    <li><a title="Bahan Baku" href="bahan-baku.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Bahan Baku</span></a></li>
                                     <li>
                                         <a class="has-arrow" href="mailbox.html" aria-expanded="false"><span class="mini-click-non">Bahan Masuk</span></a>
                                         <ul class="submenu-angle" aria-expanded="true">
@@ -135,9 +135,13 @@ while ($show = mysqli_fetch_array($queryAdmin)) {
                                             <li><a title="Bahan Masuk Perbulan" href="bahan-masuk-perbulan.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">- Perbulan</span></a></li>
                                         </ul>
                                     </li>
-
-                                    <li><a title="Bahan Rusak" href="bahan-rusak.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Bahan Rusak</span></a></li>
-                                    <li><a title="Bahan Baku" href="bahan-baku.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Bahan Baku</span></a></li>
+                                    <li>
+                                        <a class="has-arrow" href="mailbox.html" aria-expanded="false"><span class="mini-click-non">Bahan Keluar</span></a>
+                                        <ul class="submenu-angle" aria-expanded="true">
+                                            <li><a title="Bahan Masuk" href="bahan-keluar.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">- Perhari</span></a></li>
+                                            <li><a title="Bahan Masuk Perbulan" href="bahan-keluar-perbulan.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">- Perbulan</span></a></li>
+                                        </ul>
+                                    </li>
                                     <li><a title="Data Permintaan" href="data-permintaan.php?id_gudang=<?php echo $show['ID_GUDANG']; ?>"><span class="mini-sub-pro">Data Permintaan</span></a></li>
                                 </ul>
                             </li>
@@ -308,7 +312,8 @@ while ($show = mysqli_fetch_array($queryAdmin)) {
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                         <ul class="breadcome-menu">
-                                            <li><?php //echo $namaMitra; ?> <span class="bread-slash">/</span>
+                                            <li><?php //echo $namaMitra; 
+                                                ?> <span class="bread-slash">/</span>
                                             </li>
                                             <li><span class="bread-blod">Profil</span>
                                             </li>
@@ -331,127 +336,127 @@ while ($show = mysqli_fetch_array($queryAdmin)) {
                                 <img src="img/profile/1.jpg" alt="" />
                             </div>
                             <div class="profile-details-hr">
-                            <form action="" class="dropzone dropzone-custom needsclick add-professors" id="demo1-upload" method="POST">
-                            <?php while ($result = mysqli_fetch_array($query)) {?>
-                            <div class="row">
-                                    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-6">
-                                        <div class="address-hr">
-                                            <p><b>Name</b><br /></p>
-                                            <input type="text" value="<?php echo $result['NAMA_ADMIN'] ?>">
+                                <form action="" class="dropzone dropzone-custom needsclick add-professors" id="demo1-upload" method="POST">
+                                    <?php while ($result = mysqli_fetch_array($query)) { ?>
+                                        <div class="row">
+                                            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-6">
+                                                <div class="address-hr">
+                                                    <p><b>Name</b><br /></p>
+                                                    <input type="text" value="<?php echo $result['NAMA_ADMIN'] ?>">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-6">
+                                                <div class="address-hr ">
+                                                    <p><b>Username</b><br /></p>
+                                                    <input type="text" value="<?php echo $username ?>">
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-6">
-                                        <div class="address-hr ">
-                                            <p><b>Username</b><br /></p>
-                                            <input type="text" value="<?php echo $username ?>">
+                                        <div class="row">
+                                            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-6">
+                                                <div class="address-hr">
+                                                    <p><b>Email </b><br /></p>
+                                                    <input type="text" value="<?php echo $email ?>">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-6">
+                                                <div class="address-hr">
+                                                    <p><b>Phone</b><br /></p>
+                                                    <input type="text" value="<?php echo $telp ?>">
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-6">
-                                        <div class="address-hr">
-                                            <p><b>Email </b><br /></p>
-                                            <input type="text" value="<?php echo $email ?>">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="payment-adress">
+                                                    <input type="submit" name="simpan" class="btn btn-primary waves-effect waves-light"></input>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-6">
-                                        <div class="address-hr">
-                                            <p><b>Phone</b><br /></p>
-                                            <input type="text" value="<?php echo $telp ?>">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="payment-adress">
-                                            <input type="submit" name="simpan" class="btn btn-primary waves-effect waves-light"></input>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php } ?>
-                            </form>
+                                    <?php } ?>
+                                </form>
                             </div>
                         </div>
                     </div>
+                </div>
             </div>
-        </div>
-        <div class="footer-copyright-area">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="footer-copy-right">
-                            <p>Copyright © 2018. All rights reserved. Template by <a href="https://colorlib.com/wp/templates/">Colorlib</a></p>
+            <div class="footer-copyright-area">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="footer-copy-right">
+                                <p>Copyright © 2018. All rights reserved. Template by <a href="https://colorlib.com/wp/templates/">Colorlib</a></p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- jquery
+        <!-- jquery
 		============================================ -->
-    <script src="../js/vendor/jquery-1.12.4.min.js"></script>
-    <!-- bootstrap JS
+        <script src="../js/vendor/jquery-1.12.4.min.js"></script>
+        <!-- bootstrap JS
 		============================================ -->
-    <script src="../js/bootstrap.min.js"></script>
-    <!-- wow JS
+        <script src="../js/bootstrap.min.js"></script>
+        <!-- wow JS
 		============================================ -->
-    <script src="../js/wow.min.js"></script>
-    <!-- price-slider JS
+        <script src="../js/wow.min.js"></script>
+        <!-- price-slider JS
 		============================================ -->
-    <script src="../js/jquery-price-slider.js"></script>
-    <!-- meanmenu JS
+        <script src="../js/jquery-price-slider.js"></script>
+        <!-- meanmenu JS
 		============================================ -->
-    <script src="../js/jquery.meanmenu.js"></script>
-    <!-- owl.carousel JS
+        <script src="../js/jquery.meanmenu.js"></script>
+        <!-- owl.carousel JS
 		============================================ -->
-    <script src="../js/owl.carousel.min.js"></script>
-    <!-- sticky JS
+        <script src="../js/owl.carousel.min.js"></script>
+        <!-- sticky JS
 		============================================ -->
-    <script src="../js/jquery.sticky.js"></script>
-    <!-- scrollUp JS
+        <script src="../js/jquery.sticky.js"></script>
+        <!-- scrollUp JS
 		============================================ -->
-    <script src="../js/jquery.scrollUp.min.js"></script>
-    <!-- mCustomScrollbar JS
+        <script src="../js/jquery.scrollUp.min.js"></script>
+        <!-- mCustomScrollbar JS
 		============================================ -->
-    <script src="../js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
-    <script src="../js/scrollbar/mCustomScrollbar-active.js"></script>
-    <!-- metisMenu JS
+        <script src="../js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+        <script src="../js/scrollbar/mCustomScrollbar-active.js"></script>
+        <!-- metisMenu JS
 		============================================ -->
-    <script src="../js/metisMenu/metisMenu.min.js"></script>
-    <script src="../js/metisMenu/metisMenu-active.js"></script>
-    <!-- data table JS
+        <script src="../js/metisMenu/metisMenu.min.js"></script>
+        <script src="../js/metisMenu/metisMenu-active.js"></script>
+        <!-- data table JS
 		============================================ -->
-    <script src="../js/data-table/bootstrap-table.js"></script>
-    <script src="../js/data-table/tableExport.js"></script>
-    <script src="../js/data-table/data-table-active.js"></script>
-    <script src="../js/data-table/bootstrap-table-editable.js"></script>
-    <script src="../js/data-table/bootstrap-editable.js"></script>
-    <script src="../js/data-table/bootstrap-table-resizable.js"></script>
-    <script src="../js/data-table/colResizable-1.5.source.js"></script>
-    <script src="../js/data-table/bootstrap-table-export.js"></script>
-    <!--  editable JS
+        <script src="../js/data-table/bootstrap-table.js"></script>
+        <script src="../js/data-table/tableExport.js"></script>
+        <script src="../js/data-table/data-table-active.js"></script>
+        <script src="../js/data-table/bootstrap-table-editable.js"></script>
+        <script src="../js/data-table/bootstrap-editable.js"></script>
+        <script src="../js/data-table/bootstrap-table-resizable.js"></script>
+        <script src="../js/data-table/colResizable-1.5.source.js"></script>
+        <script src="../js/data-table/bootstrap-table-export.js"></script>
+        <!--  editable JS
 		============================================ -->
-    <script src="../js/editable/jquery.mockjax.js"></script>
-    <script src="../js/editable/mock-active.js"></script>
-    <script src="../js/editable/select2.js"></script>
-    <script src="../js/editable/moment.min.js"></script>
-    <script src="../js/editable/bootstrap-datetimepicker.js"></script>
-    <script src="../js/editable/bootstrap-editable.js"></script>
-    <script src="../js/editable/xediable-active.js"></script>
-    <!-- Chart JS
+        <script src="../js/editable/jquery.mockjax.js"></script>
+        <script src="../js/editable/mock-active.js"></script>
+        <script src="../js/editable/select2.js"></script>
+        <script src="../js/editable/moment.min.js"></script>
+        <script src="../js/editable/bootstrap-datetimepicker.js"></script>
+        <script src="../js/editable/bootstrap-editable.js"></script>
+        <script src="../js/editable/xediable-active.js"></script>
+        <!-- Chart JS
 		============================================ -->
-    <script src="../js/chart/jquery.peity.min.js"></script>
-    <script src="../js/peity/peity-active.js"></script>
-    <!-- tab JS
+        <script src="../js/chart/jquery.peity.min.js"></script>
+        <script src="../js/peity/peity-active.js"></script>
+        <!-- tab JS
 		============================================ -->
-    <script src="../js/tab.js"></script>
-    <!-- plugins JS
+        <script src="../js/tab.js"></script>
+        <!-- plugins JS
 		============================================ -->
-    <script src="../js/plugins.js"></script>
-    <!-- main JS
+        <script src="../js/plugins.js"></script>
+        <!-- main JS
 		============================================ -->
-    <script src="../js/main.js"></script>
+        <script src="../js/main.js"></script>
 </body>
 
 </html>
