@@ -443,9 +443,9 @@ while ($show = mysqli_fetch_array($queryNamaMitra)) {
 
 <?php
 if (isset($_POST['submit'])) {
-    $idMitra = $_GET['id_mitra'];
+    echo $idMitra = $_GET['id_mitra'];
     $idBahan = $_GET['id_bahan'];
-    $qty = $_POST['sisaStok'];
+    echo $qty = $_POST['sisaStok'];
     $tanggal = date("Y-m-d");
 
     $querySelect = mysqli_query($mysqli, "SELECT * FROM BAHAN_BAKU as bb INNER JOIN GUDANG as gd ON bb.ID_GUDANG = gd.ID_GUDANG INNER JOIN MITRA as ot ON ot.ID_GUDANG = gd.ID_GUDANG where bb.ID_BAHAN_BAKU = '$idBahan' AND ot.ID_MITRA = '$idMitra'");
