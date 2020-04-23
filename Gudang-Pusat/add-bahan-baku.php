@@ -20,6 +20,27 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
     $namaKota = $show['NAMA_GUDANG'];
 }
 
+if (isset($_POST['submit'])) {
+    $id_gudang = $_GET['id_gudang'];
+    $namaBahan = $_POST['namaBahan'];
+    $satuan = $_POST['satuan'];
+    $harga = $_POST['harga'];
+    $biayaTambahan = $_POST['biayaTambahan'];
+    $margin = $_POST['margin'];
+    $hargaJual = $_POST['hargaJual'];
+    $stokAwal = $_POST['stokAwal'];
+    $barangMasuk = $_POST['barangMasuk'];
+    $barangRusak = $_POST['barangRusak'];
+    $barangKeluar = $_POST['barangKeluar'];
+    $sisaStok = $_POST['sisaStok'];
+    $nilai = $_POST['nilai'];
+
+
+    $query =  mysqli_query($mysqli, "INSERT INTO `bahan_baku`(`ID_GUDANG`, `NAMA_BAHAN`, `SATUAN`, `HARGA`, `BIAYA_TAMBAHAN`, `MARGIN`, `HARGA_JUAL`, `STOK_AWAL`, `BARANG_MASUK`, `BARANG_RUSAK`, `BARANG_KELUAR`, `SISA_STOK`, `NILAI`) VALUES ('$id_gudang', '$namaBahan', '$satuan', '$harga', '$biayaTambahan', '$margin', '$hargaJual', '$stokAwal', '$barangMasuk', '$barangRusak', '$barangKeluar', '$sisaStok', '$nilai')");
+
+    header("Location: bahan-baku.php?id_gudang=$id_gudang");
+}
+
 ?>
 
 <!doctype html>
@@ -484,28 +505,3 @@ while ($show = mysqli_fetch_array($queryNamaKota)) {
 </body>
 
 </html>
-
-<?php
-if (isset($_POST['submit'])) {
-    $id_gudang = $_GET['id_gudang'];
-    $namaBahan = $_POST['namaBahan'];
-    $satuan = $_POST['satuan'];
-    $harga = $_POST['harga'];
-    $biayaTambahan = $_POST['biayaTambahan'];
-    $margin = $_POST['margin'];
-    $hargaJual = $_POST['hargaJual'];
-    $stokAwal = $_POST['stokAwal'];
-    $barangMasuk = $_POST['barangMasuk'];
-    $barangRusak = $_POST['barangRusak'];
-    $barangKeluar = $_POST['barangKeluar'];
-    $sisaStok = $_POST['sisaStok'];
-    $nilai = $_POST['nilai'];
-
-
-    $query =  mysqli_query($mysqli, "INSERT INTO `bahan_baku`(`ID_GUDANG`, `NAMA_BAHAN`, `SATUAN`, `HARGA`, `BIAYA_TAMBAHAN`, `MARGIN`, `HARGA_JUAL`, `STOK_AWAL`, `BARANG_MASUK`, `BARANG_RUSAK`, `BARANG_KELUAR`, `SISA_STOK`, `NILAI`) VALUES ('$id_gudang', '$namaBahan', '$satuan', '$harga', '$biayaTambahan', '$margin', '$hargaJual', '$stokAwal', '$barangMasuk', '$barangRusak', '$barangKeluar', '$sisaStok', '$nilai')");
-
-    header("Location: bahan-baku.php?id_gudang=$id_gudang");
-}
-
-
-?>
