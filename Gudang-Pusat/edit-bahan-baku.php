@@ -9,21 +9,21 @@ $username = $_SESSION['username'];
 $queryAdmin = mysqli_query($mysqli, "SELECT * FROM ADMIN_PUSAT where username='$username'") or die("data salah: " . mysqli_error($mysqli));
 
 
-$idGudang = $_GET['id_gudang'];
-$idBahanBaku = $_GET['id_bahan_baku'];
+echo $idGudang = $_GET['id_gudang'];
+echo $idBahanBaku = $_GET['id_bahan_baku'];
 
 //mengambil data gudang
-$queryGudang = mysqli_query($mysqli, "SELECT * FROM GUDANG");
+$queryGudang = mysqli_query($mysqli, "SELECT * FROM GUDANG") or die("data salah: " . mysqli_error($mysqli));
 
-$query = mysqli_query($mysqli, "SELECT * FROM BAHAN_BAKU where ID_GUDANG=$idGudang AND ID_BAHAN_BAKU=$idBahanBaku");
+$queryBB = mysqli_query($mysqli, "SELECT * FROM BAHAN_BAKU where ID_GUDANG=$idGudang AND ID_BAHAN_BAKU=$idBahanBaku") or die("data salah: " . mysqli_error($mysqli));
 
-$queryNamaKota =  mysqli_query($mysqli, "SELECT * FROM GUDANG where ID_GUDANG=$idGudang");
+$queryNamaKota =  mysqli_query($mysqli, "SELECT * FROM GUDANG where ID_GUDANG=$idGudang") or die("data salah: " . mysqli_error($mysqli));
 while ($show = mysqli_fetch_array($queryNamaKota)) {
     $namaKota = $show['NAMA_GUDANG'];
 }
 
 
-if (isset($_POST['submit'])) {
+if (isset($_POST['update'])) {
     $idGudang = $_GET['id_gudang'];
     $namaBahan = $_POST['namaBahan'];
     $satuan = $_POST['satuan'];
@@ -37,9 +37,10 @@ if (isset($_POST['submit'])) {
     $barangKeluar = $_POST['barangKeluar'];
     $sisaStok = $_POST['sisaStok'];
     $nilai = $_POST['nilai'];
+    echo $idBahanBaku;
 
 
-    $query =  mysqli_query($mysqli, "UPDATE `bahan_baku` SET `nama_bahan`='$namaBahan',`satuan`='$satuan',`harga`='$harga',`biaya_tambahan`='$biayaTambahan',`margin`='$margin',`harga_jual`='$harga',`stok_awal`='$sisaStok',`barang_masuk`='$barangMasuk',`barang_rusak`='$barangRusak',`barang_keluar`='$barangKeluar',`sisa_stok`='$sisaStok',`nilai`='$nilai' WHERE id_bahan_baku='$idBahanBaku'");
+    $queryEdit =  mysqli_query($mysqli, "UPDATE `bahan_baku` SET `NAMA_BAHAN`='$namaBahan',`SATUAN`='$satuan',`HARGA`='$harga',`BIAYA_TAMBAHAN`='$biayaTambahan',`MARGIN`='$margin',`HARGA_JUAL`='$hargaJual',`STOK_AWAL`='$stokAwal',`BARANG_MASUK`='$barangMasuk',`BARANG_RUSAK`='$barangRusak',`BARANG_KELUAR`='$barangKeluar',`SISA_STOK`='$sisaStok',`NILAI`='$nilai' WHERE `ID_BAHAN_BAKU`='$idBahanBaku'")or die("data salah: " . mysqli_error($mysqli));
 
     header("Location: bahan-baku.php?id_gudang=$idGudang");
 }
@@ -353,10 +354,9 @@ if (isset($_POST['submit'])) {
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                             <div class="review-content-section">
                                                 <div id="dropzone1" class="pro-ad">
-
-                                                    <form action="" class="dropzone dropzone-custom needsclick add-professors" id="demo1-upload" method="post">
+                                                    <form action="" class="dropzone dropzone-custom needsclick add-professors" id="demo1-upload" method="POST">
                                                         <?php
-                                                        while ($show = mysqli_fetch_array($query)) { ?>
+                                                        while ($show = mysqli_fetch_array($queryBB)) { ?>
                                                             <div class="row">
                                                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="form-group">
@@ -414,7 +414,7 @@ if (isset($_POST['submit'])) {
                                                             <div class="row">
                                                                 <div class="col-lg-12">
                                                                     <div class="payment-adress">
-                                                                        <button type="submit" name="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                                                                        <input type="submit" name="update" value="submit" class="btn btn-primary waves-effect waves-light">
                                                                     </div>
                                                                 </div>
                                                             </div>
